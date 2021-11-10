@@ -14,7 +14,9 @@ from libs.text_normalizer.header_all_text_normalizers import *
 from libs.tokenizers.header_all_tokenizers import *
 from preprocessors.text_preprocessor.header_text_preprocessor import *
 
-
+"""
+Для старта нужно выполнить setup.py в ~/libs/setup.py
+"""
 
 text_preprocessor = TextPreprocessor(
     word_tokenizer=RegexWordTokenizer(),
@@ -28,8 +30,8 @@ text_preprocessor = TextPreprocessor(
 )
 
 
-# models_manager = FastTextManager()
-# models_manager.load_models(PATH_2_SUPERVISED_MODEL, PATHS_2_UNSUPERVISED_MODELS)
+models_manager = FastTextManager()
+models_manager.load_models(PATH_2_SUPERVISED_MODEL, PATHS_2_UNSUPERVISED_MODELS)
 
 
 app = Flask(__name__)
@@ -51,6 +53,7 @@ def parse_train_data(data):
     return parsed_data
 
 # s = """__label__sport привет, завтра будет турнир по футболу __label__sport давай играть в догонялки __label__sport будем бегать на перегонки __label__esports пошли играть в компьютер? __label__esports завтра будет турнир по доте!!! __label__esports хочу скачать вот эту игру на компьютер __label__esports играем в морской бой онлайн __label__sport займуська я плаванием __label__sport буду прыгать через скакалку __label__sport вчера был чемпионат мира по волейболу!!! __label__esports игра, в которую можно играть с друзьями по сети __label__esports буду тренироваться играть за пятёрку в доте __label__esports в какие игры любишь играть на пк? __label__sport я сегодня поборол тренера! __label__sport завтра буду качать пресс __label__sport скоро зима, будем кататься на лыжах! __label__sport и так, делаем наклоны туловища вперед и назад __label__esports надо обновить пк, чтобы играть в такие игры __label__esports настало время поиграть в эту видеоигру __label__esports мам, мне надо играть, чтобы стать киберспорстменом!"""
+
 # print(parse_train_data(s))
 
 def retrain_model(atrs):
@@ -79,11 +82,6 @@ def retrain_model(atrs):
     models_manager.get_model(SUPERVISED, SUPERVISED).save_model(PATH_2_SUPERVISED_MODEL)
     os.remove(name_train)
 
-
-# def process_text(data, *args, **kwargs):
-#
-#
-#     return ""
 
 def download_model(url):
     global models_manager
@@ -118,6 +116,13 @@ def download_model(url):
     except:
         return f"Error download file"
 
+
+"""
+Example (download_fasttext_model):
+http://127.0.0.1:5000/download/en
+"""
+
+
 @app.route('/download/<lang>')
 def download_fasttext_model(lang):
 
@@ -126,9 +131,21 @@ def download_fasttext_model(lang):
     return result
 
 
+"""
+Example (downloaded_fasttext_models):
+http://127.0.0.1:5000/downloaded
+"""
+
+
 @app.route('/downloaded')
 def downloaded_fasttext_models():
     return jsonify(models_manager.get_facebook_models)
+
+
+"""
+Example (retrain_classifier):
+http://127.0.0.1:5000/retrain_classifier?input=__label__sport привет, завтра будет турнир по футболу __label__sport давай играть в догонялки __label__sport будем бегать на перегонки __label__esports пошли играть в компьютер? __label__esports завтра будет турнир по доте!!! __label__esports хочу скачать вот эту игру на компьютер __label__esports играем в морской бой онлайн __label__sport займуська я плаванием __label__sport буду прыгать через скакалку __label__sport вчера был чемпионат мира по волейболу!!! __label__esports игра, в которую можно играть с друзьями по сети __label__esports буду тренироваться играть за пятёрку в доте __label__esports в какие игры любишь играть на пк? __label__sport я сегодня поборол тренера! __label__sport завтра буду качать пресс __label__sport скоро зима, будем кататься на лыжах! __label__sport и так, делаем наклоны туловища вперед и назад __label__esports надо обновить пк, чтобы играть в такие игры __label__esports настало время поиграть в эту видеоигру __label__esports мам, мне надо играть, чтобы стать киберспорстменом!
+"""
 
 
 @app.route('/retrain_classifier', methods=["GET"])
@@ -143,6 +160,13 @@ def retrain_classifier():
         return "Failed"
 
 
+"""
+Example (classify):
+http://127.0.0.1:5000/classify?input=хотелось бы поиграть в онлайн игры((
+http://127.0.0.1:5000/classify?input=слушай, займись спортом, побегай по утрам
+"""
+
+
 @app.route('/classify', methods=["GET"])
 def classify():
 
@@ -154,6 +178,16 @@ def classify():
         return str(result)
     except:
         return "Error classify text"
+
+
+"""
+for this function to work correctly, download cc.ru.300.bin
+http://127.0.0.1:5000/download/ru
+
+
+Example (get_word_vector):
+http://127.0.0.1:5000/get_word_vector?input=мама папа дедушка и сын
+"""
 
 
 @app.route('/word_vectors', methods=["GET"])
@@ -175,13 +209,12 @@ def get_word_vector():
         return "Error vectorize text"
 
 
-
 @app.route('/')
 def index():
     return "API FastText"
 
-# if __name__ == '__main__':
-#     app.run(
-#         debug=True,
-#         use_reloader=False
-#     )
+if __name__ == '__main__':
+    app.run(
+        debug=True,
+        use_reloader=False
+    )
