@@ -85,45 +85,38 @@ def retrain_model(atrs):
 #
 #     return ""
 
-def download_model(url, l=True):
+def download_model(url):
     global models_manager
-    # try:
-    name = url.split('/')[-1].lower()
-    gzfile  = dirname(abspath(__file__)) + "/models/unsupervised/" + name
-    bin_file = gzfile[:-3]
-    # if len(name) >= 100 or re.findall('[a-z]+', name)[1] not in LANGS:
-    #     return f"Incorrect code {re.findall('[a-z]+', name)[1]}"
-    #
-    #
-    # if bin_file in PATHS_2_UNSUPERVISED_MODELS and bin_file in models_manager.get_facebook_models:
-    #     return f"Model {name} downloaded"
-    #
-    #
-    # elif bin_file in PATHS_2_UNSUPERVISED_MODELS:
-    #     return f"Model {name} is downloading"
+    try:
+        name = url.split('/')[-1].lower()
+        bin_file = dirname(abspath(__file__)) + "/models/unsupervised/" + name[:-3]
+        if len(name) >= 100 or re.findall('[a-z]+', name)[1] not in LANGS:
+            return f"Incorrect code {re.findall('[a-z]+', name)[1]}"
 
 
-    # PATHS_2_UNSUPERVISED_MODELS.append(bin_file)
-    # with requests.get(url, stream=True) as r:
-    #     with open(gzfile, 'wb') as fname:
-    #         shutil.copyfileobj(r.raw, fname)
-    #         fname.close()
-    #     r.close()
-
-    with gzip.open(gzfile, 'rb') as compressed:
-        with open(bin_file, 'wb') as bin_:
-            bin_.write(gzip.decompress(compressed.read()))
-            bin_.close()
-
-    models_manager.load_models(paths_unsupervised_models=bin_file)
-
-    os.remove(gzfile)
-    return f"Start download model {name}"
-    # except:
-    #     return f"Error download file"
+        if bin_file in PATHS_2_UNSUPERVISED_MODELS and bin_file in models_manager.get_facebook_models:
+            return f"Model {name} downloaded"
 
 
-download_model('cc.en.300.bin.gz')
+        elif bin_file in PATHS_2_UNSUPERVISED_MODELS:
+            return f"Model {name} is downloading"
+
+
+        PATHS_2_UNSUPERVISED_MODELS.append(bin_file)
+        with requests.get(url, stream=True) as r:
+            d = zlib.decompressobj(zlib.MAX_WBITS | 32)
+            with open(bin_file, 'wb') as fname:
+                for chunk in r.iter_content(1024**2):
+                    buffer = d.decompress(chunk)
+                    fname.write(buffer)
+                buffer = d.flush()
+                fname.write(buffer)
+
+        models_manager.load_models(paths_unsupervised_models=bin_file)
+
+        return f"Start download model {name}"
+    except:
+        return f"Error download file"
 
 @app.route('/download/<lang>')
 def download_fasttext_model(lang):
