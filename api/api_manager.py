@@ -10,13 +10,19 @@ from langdetect import detect
 from api.fastText.fasttext_manager import *
 from api.constants import PATHS_2_UNSUPERVISED_MODELS, PATH_2_SUPERVISED_MODEL, LANGS
 import re
-from libs.text_normalizer.header_all_text_normalizers import *
-from libs.tokenizers.header_all_tokenizers import *
-from preprocessors.text_preprocessor.header_text_preprocessor import *
+
 
 """
 Для старта нужно выполнить setup.py в ~/libs/setup.py
+Если запустиь API без обработки текста, поставьте PROCESS_TEXT=False
+и закомментируйте строки с 22 по 36
+(не успел сделать нормальное взаимодействие между клиентом и сервером)
 """
+PROCESS_TEXT=True
+
+from libs.text_normalizer.header_all_text_normalizers import *
+from libs.tokenizers.header_all_tokenizers import *
+from preprocessors.text_preprocessor.header_text_preprocessor import *
 
 text_preprocessor = TextPreprocessor(
     word_tokenizer=RegexWordTokenizer(),
@@ -47,9 +53,12 @@ def parse_train_data(data):
                 parsed_data.append(new_offer)
             new_offer = token
         else:
-            token = text_preprocessor.preprocess_text(token)
-            if token:
-                new_offer += ' ' + token[0]
+            if PROCESS_TEXT:
+                token = text_preprocessor.preprocess_text(token)
+                if token:
+                    new_offer += ' ' + token[0]
+            else:
+                new_offer += token
     return parsed_data
 
 
