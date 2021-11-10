@@ -52,9 +52,6 @@ def parse_train_data(data):
                 new_offer += ' ' + token[0]
     return parsed_data
 
-# s = """__label__sport привет, завтра будет турнир по футболу __label__sport давай играть в догонялки __label__sport будем бегать на перегонки __label__esports пошли играть в компьютер? __label__esports завтра будет турнир по доте!!! __label__esports хочу скачать вот эту игру на компьютер __label__esports играем в морской бой онлайн __label__sport займуська я плаванием __label__sport буду прыгать через скакалку __label__sport вчера был чемпионат мира по волейболу!!! __label__esports игра, в которую можно играть с друзьями по сети __label__esports буду тренироваться играть за пятёрку в доте __label__esports в какие игры любишь играть на пк? __label__sport я сегодня поборол тренера! __label__sport завтра буду качать пресс __label__sport скоро зима, будем кататься на лыжах! __label__sport и так, делаем наклоны туловища вперед и назад __label__esports надо обновить пк, чтобы играть в такие игры __label__esports настало время поиграть в эту видеоигру __label__esports мам, мне надо играть, чтобы стать киберспорстменом!"""
-
-# print(parse_train_data(s))
 
 def retrain_model(atrs):
     global models_manager
